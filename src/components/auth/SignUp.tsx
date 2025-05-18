@@ -1,0 +1,106 @@
+"use client";
+
+import React, { useActionState } from "react";
+import Form from "next/form";
+import { BiLoader } from "react-icons/bi";
+const initialState = {
+  message: "",
+};
+
+type SignUpProps = {
+  action: (
+    prevState: any,
+    formData: FormData
+  ) => Promise<{ message: string } | undefined>;
+};
+
+const SignUp = ({ action }: SignUpProps) => {
+  const [state, formAction, isPending] = useActionState(action, initialState);
+
+  return (
+    <Form
+      action={formAction}
+      className="max-w-md mx-auto my-16 p-8 bg-gray-100 rounded-lg shadow-md"
+    >
+      <h1 className="text-2xl font-bold text-center mb-2 text-black">
+        Join the DEAL Revolution
+      </h1>
+      <p className="text-center text-sm text-rose-600 font-semibold mb-2">
+        LIMITED TIME OFFER
+      </p>
+      <p className="text-center text-sm text-gray-500 font-semibold mb-6">
+        Sign up now and get 90% OFF on your first order!
+      </p>
+
+      <div className="space-y-6">
+        {/* email */}
+        <div className="space-y-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-800"
+          >
+            Email address
+          </label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            autoComplete="email"
+            required
+            className="text-gray-500 w-full px-4 py-3 border border-gray-400 rounded-md focus:ring-1 focus:ring-black focus:border-transparent transition-colors"
+            placeholder="Enter your email"
+          />
+        </div>
+
+        {/* password */}
+        <div className="space-y-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-800"
+          >
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            autoComplete="new-password"
+            required
+            className="text-gray-500 w-full px-4 py-3 border border-gray-400 rounded-md focus:ring-1 focus:ring-black focus:border-transparent transition-colors"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        {/* Copywriting */}
+        <div className="text-center">
+          <p className="text-xs text-gray-500 mb-2">
+            ⚡ Only 127 welcome bonus packages remaining!
+          </p>
+          <p className="text-xs text-gray-500 mb-4">
+            ⌛ Offer expires in: 13:45
+          </p>
+        </div>
+
+        {/* Submit button */}
+        <button
+          type="submit"
+          disabled={isPending}
+          className={`w-full bg-rose-600 text-white py-3 rounded-md hover:bg-rose-700 transition-colors font-medium flex items-center justify-center gap-2 ${isPending && 'cursor-not-allowed'}`}
+        >
+            {
+                isPending ? (
+                    <>
+                       <BiLoader className="h-4 w-4 animate-spin"/>
+                       CREATING ACCOUNT...
+                    </>
+                ) : (
+                    'CREATE ACCOUNT'
+                )
+            }
+        </button>
+      </div>
+    </Form>
+  );
+};
+
+export default SignUp;
