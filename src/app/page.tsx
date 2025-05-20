@@ -1,9 +1,14 @@
+import { getCurrentSession } from '@/actions/auth'
 import React from 'react'
 
-const page = () => {
+const Home = async () => {
+
+  const {user} = await getCurrentSession();
   return (
-    <div>page</div>
+    <div>
+      {JSON.stringify(user)}
+    </div>
   )
 }
 
-export default page
+export default Home

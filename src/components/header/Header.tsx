@@ -6,10 +6,31 @@ import { CiSearch } from "react-icons/ci";
 import { CiShoppingCart } from "react-icons/ci";
 import Announcement from './Announcement'
 import Link from 'next/link';
+import { User } from '@prisma/client';
+import { useRouter } from 'next/navigation';
 
-const Header = () => {
+
+type HeaderProps = {
+  user : Omit<User, 'passwordHash'> | null;
+}
+
+
+
+const Header = ({user} : HeaderProps) => {
   const [isOpen, setIsOpen] = useState<Boolean>(true);
   const [prevScrollY, setPrevScrollY] = useState<number>(0)
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+      router.refresh()
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
 
   useEffect(()=>{
     const handleScroll = ()=>{
@@ -51,15 +72,31 @@ const Header = () => {
                  </nav>
                 </div>
 
-                <Link href={""}>DEAL</Link>
+                <Link href={""} className='absolute left-1/2 -translate-x-1/2'>
+                  <span className='text-xl sm:text-2xl font-bold tracking-tight'>
+                    DEAL
+                  </span>
+                
+                </Link>
 
                 <div className='flex flex-1 justify-end items-center gap-2 sm:gap-4'>
                   <button className='text-gray-700 hover:text-gray-900 hidden sm:block'>
                     <CiSearch size={25}/>
                   </button>
 
-                  <Link href={'/auth/sign-in'}>Sign In</Link>
-                  <Link href={'/auth/sign-up'}>Sign Up</Link>
+                  {user ? (
+                    <div className='flex items-center gap-2 sm:gap-4 justify-center'>
+                      <span className='text-sm text-gray-700 hidden md:block'>{user.email}</span>
+                       <button className="text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 bg-gray-200 rounded-lg px-4 py-2" onClick={()=>handleSignOut()}>
+                        Sign Out
+                      </button>
+                    </div>
+                  ): (
+                    <>
+                      <Link href={`/auth/sign-in`}>Sign In</Link>
+                      <Link href={`/auth/sign-up`}>Sign Up</Link>
+                    </>
+                  )}
 
                   <button className='text-gray-700 hover:text-gray-900 relative'>
                     <CiShoppingCart size={25}/>

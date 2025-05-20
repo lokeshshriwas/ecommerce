@@ -7,14 +7,14 @@ const initialState = {
   message: "",
 };
 
-type SignUpProps = {
+type SignInProps = {
   action: (
     prevState: any,
     formData: FormData
   ) => Promise<{ message: string } | undefined>;
 };
 
-const SignUp = ({ action }: SignUpProps) => {
+const SignIn = ({ action }: SignInProps) => {
   const [state, formAction, isPending] = useActionState(action, initialState);
 
   return (
@@ -23,13 +23,13 @@ const SignUp = ({ action }: SignUpProps) => {
       className="max-w-md mx-auto my-16 p-8 bg-gray-100 rounded-lg shadow-md"
     >
       <h1 className="text-2xl font-bold text-center mb-2 text-black">
-        Join the DEAL Revolution
+        Welcome Back!
       </h1>
       <p className="text-center text-sm text-rose-600 font-semibold mb-2">
-        LIMITED TIME OFFER
+        🔥 MEMBER EXCLUSIVE 🔥
       </p>
       <p className="text-center text-sm text-gray-500 font-semibold mb-6">
-        Sign up now and get 90% OFF on your first order!
+        Sign in to access your exclusive memeber deals.
       </p>
 
       <div className="space-y-6">
@@ -74,10 +74,10 @@ const SignUp = ({ action }: SignUpProps) => {
         {/* Copywriting */}
         <div className="text-center">
           <p className="text-xs text-gray-500 mb-2">
-            ⚡ Only 127 welcome bonus packages remaining!
+            ⚡ Members save an extra 15% on all orders!
           </p>
           <p className="text-xs text-gray-500 mb-4">
-            ⌛ Offer expires in: 13:45
+            🔏 Plus get free shipping on orders over ₹300
           </p>
         </div>
 
@@ -91,10 +91,10 @@ const SignUp = ({ action }: SignUpProps) => {
                 isPending ? (
                     <>
                        <BiLoader className="h-4 w-4 animate-spin"/>
-                       CREATING ACCOUNT...
+                        SIGNING IN...
                     </>
                 ) : (
-                    'CREATE ACCOUNT'
+                    'SIGN IN'
                 )
             }
         </button>
@@ -109,4 +109,4 @@ const SignUp = ({ action }: SignUpProps) => {
   );
 };
 
-export default SignUp;
+export default SignIn;

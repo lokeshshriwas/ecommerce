@@ -1,5 +1,5 @@
-import { getCurrentSession, loginUser, registerUser } from '@/actions/auth'
-import SignUp from '@/components/auth/SignUp';
+import { getCurrentSession, loginUser } from '@/actions/auth'
+import SignIn from '@/components/auth/SignIn';
 import { redirect } from 'next/navigation';
 import { SignUpSchema } from '@/schema/authSchema';
 import React from 'react'
@@ -18,17 +18,16 @@ const SignUpPage = async () => {
         return { message : 'Invalid form data'}
     }
     const {email, password} = parsed.data;
-    const {user, error} = await registerUser(email, password);
+    const {user, error} = await loginUser(email, password);
     if(error){
         return {message : error}
     } else if (user){
-        await loginUser(email, password)
         return redirect('/');
     }
   }
 
   return (
-    <SignUp action={action}/>
+    <SignIn action={action}/>
   )
 }
 

@@ -56,6 +56,7 @@ export async function validateSessionToken(token: string): Promise<SessionValida
 			}
 		});
 	}
+	
 	return { session, user };
 }
 
