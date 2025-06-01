@@ -8,15 +8,17 @@ import Announcement from './Announcement'
 import Link from 'next/link';
 import { User } from '@prisma/client';
 import { useRouter } from 'next/navigation';
+import HeaderSearchBar from '../layout/HeaderSearchBar';
 
 
 type HeaderProps = {
   user : Omit<User, 'passwordHash'> | null;
+  categorySelector : React.ReactNode;
 }
 
 
 
-const Header = ({user} : HeaderProps) => {
+const Header = ({user, categorySelector} : HeaderProps) => {
   const [isOpen, setIsOpen] = useState<Boolean>(true);
   const [prevScrollY, setPrevScrollY] = useState<number>(0)
   const router = useRouter()
@@ -68,6 +70,7 @@ const Header = ({user} : HeaderProps) => {
                  <nav className='hidden md:flex gap-4 lg:gap-6 text-sm font-medium'>
                   <Link href={""}>Shop</Link>
                   <Link href={""}>New Arrivals</Link>
+                  {categorySelector}
                   <Link href={""}>Sale</Link>
                  </nav>
                 </div>
@@ -80,9 +83,7 @@ const Header = ({user} : HeaderProps) => {
                 </Link>
 
                 <div className='flex flex-1 justify-end items-center gap-2 sm:gap-4'>
-                  <button className='text-gray-700 hover:text-gray-900 hidden sm:block'>
-                    <CiSearch size={25}/>
-                  </button>
+                  <HeaderSearchBar/>
 
                   {user ? (
                     <div className='flex items-center gap-2 sm:gap-4 justify-center'>
