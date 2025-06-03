@@ -7,6 +7,7 @@ import { BiChevronRight } from "react-icons/bi";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import { formatPrice } from "@/utils/util";
+import AddToCartButton from "@/components/product/AddToCartButton";
 
 const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
@@ -143,7 +144,22 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
               </div>
             </div>
 
-            {/* <AddToCartButton product={product} /> */}
+            <AddToCartButton product={product} />
+
+            <div className="flex flex-col gap-3 mt-6 text-sm bg-white p-4 shadow-sm border border-gray-100 text-gray-800">
+              <div className="flex items-center gap-3 tex-gray-700">
+                <span className="bg-green-100 p-2 rounded-full">✅</span>
+                <span className="font-medium">In Stock - Ships within 24 hours</span>
+              </div>
+              <div className="flex items-center gap-3 tex-gray-700">
+                <span className="bg-green-100 p-2 rounded-full">🔁</span>
+                <span className="font-medium">Money Back Guarantee</span>
+              </div>
+              <div className="flex items-center gap-3 tex-gray-700">
+                <span className="bg-green-100 p-2 rounded-full">🛡️</span>
+                <span className="font-medium">Secure Payment Processing</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
