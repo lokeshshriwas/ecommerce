@@ -1,9 +1,10 @@
+import { updateCartItem } from "@/actions/cart-actions";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 export interface CartItem {
-  productId: string;
-  name: string;
+  id: string;
+  title: string;
   price: number;
   quantity: number;
   image?: string;
@@ -16,8 +17,8 @@ export interface CartStore {
   cartId: string | null;
   setStore: (id: Partial<CartItem>) => void;
   addItem: (item: CartItem) => Promise<void>;
-  removeItem: (productId: string) => Promise<void>;
-  updateItemQuantity: (productId: string, quantity: number) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
+  updateItemQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => void;
   open: () => void;
   close: () => void;
@@ -41,48 +42,67 @@ export const useCartStore = create<CartStore>()(
       setStore: (partialItem) => set((state) => ({ ...state, ...partialItem })),
 
       addItem: async (item) => {
-        set((state) => {
-          const existingItem = state.items.find(
-            (i) => i.productId === item.productId
-          );
-          if (existingItem) {
-            return {
-              items: state.items.map((i) =>
-                i.productId === item.productId
-                  ? { ...i, quantity: i.quantity + item.quantity }
-                  : i
-              ),
-            };
-          } else {
-            return { items: [...state.items, item] };
-          }
+        const { cartId } = get();
+        if (!cartId) {
+          return;
+        }
+        const updatedCart = await updateCartItem(cartId, item.id, {
+          title: item.title,
+          price: item.price,
+          image: item.image,
+          quantity: item.quantity,
         });
-      },
 
-      removeItem: async (productId) => {
         set((state) => ({
-          items: state.items.filter((item) => item.productId !== productId),
+          ...state,
+          cartId: updatedCart.id,
+          items: [...state.items, item],
         }));
       },
 
-      updateItemQuantity: async (productId, quantity) => {
+      removeItem: async (id) => {
+        const { cartId } = get();
+        if (!cartId) {
+          return;
+        }
+        const updatedCart = await updateCartItem(cartId, id, {
+          quantity: 0,
+        });
+
         set((state) => ({
-          items: state.items.map((item) =>
-            item.productId === productId ? { ...item, quantity } : item
-          ),
+          ...state,
+          cartId: updatedCart.id,
+          items: state.items.filter((item) => item.id !== id)
         }));
       },
 
-      clearCart: () =>{
-        set((state)=>({ ... state,  items: [] }))
+
+      updateItemQuantity: async (id, quantity) => {
+        const { cartId } = get();
+        if (!cartId) {
+          return;
+        }
+        const updatedCart = await updateCartItem(cartId, id, {
+          quantity: quantity,
+        });
+
+        set((state) => ({
+          ...state,
+          cartId: updatedCart.id,
+          items: state.items.filter((item) => item.id !== id)
+        }));
+      },
+
+      clearCart: () => {
+        set((state) => ({ ...state, items: [] }));
       },
 
       open: () => {
-        set((state)=>({...state,  isOpen: true }))
+        set((state) => ({ ...state, isOpen: true }));
       },
-      
+
       close: () => {
-        set((state)=>({...state,  isOpen: false }))
+        set((state) => ({ ...state, isOpen: false }));
       },
 
       setLoaded: (loaded) => {
@@ -103,9 +123,9 @@ export const useCartStore = create<CartStore>()(
         ),
     }),
     {
-      name: "cart-storage", // name of the item in localStorage
+      name: "cart-storage",
       skipHydration: true,
-      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

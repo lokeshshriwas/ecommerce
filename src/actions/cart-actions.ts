@@ -44,7 +44,7 @@ export const getOrCreateCart = async (cartId?: string | null) => {
   return cart;
 };
 
-const updateCartItem = async (
+export const updateCartItem = async (
   cartId: string,
   sanityProductId: string,
   data: {
@@ -59,36 +59,39 @@ const updateCartItem = async (
     (item) => item.sanityProductId === sanityProductId
   );
 
-  if(!existingItem) {
-    if(data.quantity === 0){
+  const quantity = data.quantity ?? 1;
+
+  if (existingItem) {
+    if (quantity <= 0) {
+      // Remove item if quantity is 0 or negative
       await prisma.cartLineItem.delete({
-        where: {
-          id: existingItem?.id
-        }
-      })
-    } else if (data.quantity && data.quantity > 0){
+        where: { id: existingItem.id },
+      });
+    } else {
+      // Update quantity if item exists
       await prisma.cartLineItem.update({
-        where : {
-          id : existingItem?.id
-        }, 
-        data :{
-          quantity : data.quantity
-        }
-      })
-    } else if (data.quantity && data.quantity < 0){
+        where: { id: existingItem.id },
+        data: { quantity },
+      });
+    }
+  } else {
+    if (quantity > 0) {
+      // Create item if it doesn't exist and quantity is positive
       await prisma.cartLineItem.create({
         data: {
           id: crypto.randomUUID(),
-          cartId : cart?.id,
-          sanityProductId: sanityProductId,
-          quantity : data.quantity || 1,
-          title : data.title || '',
-          price : data.price || 0,
-          image : data.image || ''
-        }
-      })
+          cartId: cart.id,
+          sanityProductId,
+          title: data.title ?? '',
+          price: data.price ?? 0,
+          image: data.image ?? '',
+          quantity,
+        },
+      });
     }
+    // If quantity is 0 or negative and item doesn't exist, do nothing
   }
-  revalidatePath('/')
-  return getOrCreateCart(cartId)
+
+  revalidatePath('/'); // Optional: specify the path if needed
+  return getOrCreateCart(cartId);
 };
