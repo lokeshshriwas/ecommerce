@@ -1,4 +1,4 @@
-import { updateCartItem } from "@/actions/cart-actions";
+import { getOrCreateCart, syncCartWithUser, updateCartItem } from "@/actions/cart-actions";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -55,7 +55,7 @@ export const useCartStore = create<CartStore>()(
 
         set((state) => ({
           ...state,
-          cartId: updatedCart.id,
+          cartId: updatedCart?.id,
           items: [...state.items, item],
         }));
       },
@@ -71,7 +71,7 @@ export const useCartStore = create<CartStore>()(
 
         set((state) => ({
           ...state,
-          cartId: updatedCart.id,
+          cartId: updatedCart?.id,
           items: state.items.filter((item) => item.id !== id)
         }));
       },
@@ -88,7 +88,7 @@ export const useCartStore = create<CartStore>()(
 
         set((state) => ({
           ...state,
-          cartId: updatedCart.id,
+          cartId: updatedCart?.id,
           items: state.items.filter((item) => item.id !== id)
         }));
       },
@@ -110,7 +110,16 @@ export const useCartStore = create<CartStore>()(
       },
 
       syncWithUser: async () => {
-        console.log("Syncing cart with user...");
+        const { cartId } = get();
+        if (!cartId) {
+          const cart  = await getOrCreateCart();
+          set((state) => ({ ...state, cartId: cart?.id, items: cart?.items }));
+        }
+        const syncedCard = await syncCartWithUser(cartId);
+        if(syncedCard){
+          set((state) => ({ ...state, cartId: syncedCard?.id, items: syncedCard?.items }));
+        }
+       
       },
 
       getTotalItems: () =>
