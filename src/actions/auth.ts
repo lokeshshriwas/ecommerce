@@ -126,10 +126,10 @@ export const registerUser = async(email : string, password: string)=>{
             const safeUser = {...user, passwordHash : undefined}
             return {user : safeUser, error : null}
         } else{
-            return { user : null, error : 'User already exists'}
+            return { user : null, error : `User already exists`}
         }
     } catch (e) {
-        return {user :null, error: 'Failed to register user'}
+        return {user :null, error: `Failed to register user error : ${e}`}
     }
 }
 

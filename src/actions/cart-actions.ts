@@ -6,7 +6,6 @@ import { revalidatePath } from "next/cache";
 
 export const createCart = async () => {
   const { user } = await getCurrentSession();
-  if (!user) return null;
 
   const cart = await prisma.cart.create({
     data: {
@@ -33,14 +32,14 @@ export const getOrCreateCart = async (cartId?: string | null) => {
     if (userCart) return userCart;
   }
 
-  if (!cartId) return await createCart();
+  if (!cartId) return createCart();
 
   const cart = await prisma.cart.findUnique({
     where: { id: cartId },
     include: { items: true },
   });
 
-  if (!cart) return await createCart();
+  if (!cart) return createCart();
   return cart;
 };
 
@@ -77,17 +76,19 @@ export const updateCartItem = async (
   } else {
     if (quantity > 0) {
       // Create item if it doesn't exist and quantity is positive
-      await prisma.cartLineItem.create({
-        data: {
-          id: crypto.randomUUID(),
-          cartId: cart.id,
-          sanityProductId,
-          title: data.title ?? "",
-          price: data.price ?? 0,
-          image: data.image ?? "",
-          quantity,
-        },
-      });
+      if (cart) {
+        await prisma.cartLineItem.create({
+          data: {
+            id: crypto.randomUUID(),
+            cartId: cart.id,
+            sanityProductId,
+            title: data.title ?? "",
+            price: data.price ?? 0,
+            image: data.image ?? "",
+            quantity,
+          },
+        });
+      }
     }
     // If quantity is 0 or negative and item doesn't exist, do nothing
   }

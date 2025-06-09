@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import {  NextResponse } from 'next/server';
 import { logoutUser } from '@/actions/auth'; // adjust path if needed
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     await logoutUser();
     return NextResponse.json({ message: 'Logged out successfully' }, { status: 200 });

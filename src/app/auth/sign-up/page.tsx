@@ -11,7 +11,7 @@ const SignUpPage = async () => {
     return redirect('/')
   }
 
-  const action = async (prevState :any, formData : FormData)=>{
+  const action = async (state: { message: string } | undefined, formData: FormData)=>{
     'use server'
     const parsed = SignUpSchema.safeParse(Object.fromEntries(formData))
     if(!parsed.success){

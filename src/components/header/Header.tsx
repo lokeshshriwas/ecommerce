@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from 'react'
 import { CiMenuBurger } from "react-icons/ci";
-import { CiSearch } from "react-icons/ci";
 import { CiShoppingCart } from "react-icons/ci";
 import Announcement from './Announcement'
 import Link from 'next/link';
 import { User } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import HeaderSearchBar from '../layout/HeaderSearchBar';
+import { useShallow } from 'zustand/shallow';
+import { CartStore, useCartStore } from '@/store/cart-store';
 
 
 type HeaderProps = {
@@ -19,9 +20,16 @@ type HeaderProps = {
 
 
 const Header = ({user, categorySelector} : HeaderProps) => {
-  const [isOpen, setIsOpen] = useState<Boolean>(true);
+  const [isOpen, setIsOpen] = useState<boolean>(true);
   const [prevScrollY, setPrevScrollY] = useState<number>(0)
   const router = useRouter()
+
+  const {open, getTotalItems} = useCartStore(
+    useShallow((state : CartStore)=> ({
+      open: state.open,
+      getTotalItems: state.getTotalItems
+    }))
+  )
 
   const handleSignOut = async () => {
     try {
@@ -99,9 +107,9 @@ const Header = ({user, categorySelector} : HeaderProps) => {
                     </>
                   )}
 
-                  <button className='text-gray-700 hover:text-gray-900 relative'>
+                  <button onClick={()=>open()} className='text-gray-700 hover:text-gray-900 relative'>
                     <CiShoppingCart size={25}/>
-                    <span className='absolute -top-1 -right-1 bg-black text-white text-[10px] sm:text-xs w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full flex items-center justify-center'>0</span>
+                    <span className='absolute -top-1 -right-1 bg-black text-white text-[10px] sm:text-xs w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full flex items-center justify-center'>{getTotalItems()}</span>
                   </button>
                 </div>
               </div>

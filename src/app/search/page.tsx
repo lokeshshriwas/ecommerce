@@ -17,10 +17,10 @@ const CategoryPage = async ({ searchParams }: SearchPageProps) => {
       <div className="bg-red-50 p-4">
         <div className="container mx-auto">
           <h1 className="text-2xl md:text-3xl font-bold text-center text-red-600 mb-2">
-            Search Results for "{query}" - UP TO 90% OFF! 🔥
+            Search Results for &quot{query}&quot - UP TO 90% OFF! 🔥
           </h1>
           <p className="text-center text-red-600 text-sm md:text-base animate-pulse">
-            🔥 Flash Sale Ending Soon! ⏰ Limited Time Offer"
+            🔥 Flash Sale Ending Soon! ⏰ Limited Time Offer
           </p>
           <p className="text-center text-gray-600 text-xs mt-2">
             Discover amazing deals matching your search
