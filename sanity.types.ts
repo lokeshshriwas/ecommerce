@@ -13,6 +13,45 @@
  */
 
 // Source: schema.json
+export type Order = {
+  _type: "order";
+  orderNumber?: string;
+  orderDate?: string;
+  customerId?: string;
+  customerEmail?: string;
+  stripeCustomerId?: string;
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string;
+  totalPrice?: number;
+  shippingAddress?: ShippingAddress;
+  orderItems?: Array<{
+    _key: string;
+  } & OrderItem>;
+  status?: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+};
+
+export type OrderItem = {
+  _type: "orderItem";
+  product?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "product";
+  };
+  quantity?: number;
+  price?: number;
+};
+
+export type ShippingAddress = {
+  _type: "shippingAddress";
+  name?: string;
+  line1?: string;
+  line2?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+};
+
 export type Product = {
   _id: string;
   _type: "product";
@@ -198,5 +237,5 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Product | ProductCategory | PromotionCampaign | PromotionCodes | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = Order | OrderItem | ShippingAddress | Product | ProductCategory | PromotionCampaign | PromotionCodes | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
