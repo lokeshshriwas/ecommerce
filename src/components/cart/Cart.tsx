@@ -1,7 +1,7 @@
 "use client";
 
 import { CartStore, useCartStore } from "@/store/cart-store";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { useShallow } from "zustand/shallow";
 import { CiShoppingCart } from "react-icons/ci";
@@ -9,9 +9,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/utils/util";
 import { MdOutlineDelete } from "react-icons/md";
+import { createCheckoutSession } from "@/actions/stripe-actions";
+import { BiLoader } from "react-icons/bi";
 
 const Cart = () => {
   const {
+    cartId,
     getTotalPrice,
     removeItem,
     updateItemQuantity,
@@ -32,23 +35,35 @@ const Cart = () => {
       updateItemQuantity: state.updateItemQuantity,
       removeItem: state.removeItem,
       getTotalPrice: state.getTotalPrice,
+      cartId: state.cartId,
     }))
   );
 
   const totalPrice = getTotalPrice();
+  const [loadingProceed, setLoadingProceed] = useState<boolean>(false);
 
   const remainingForFreeShipping = useMemo(() => {
     return 15 - totalPrice;
   }, [totalPrice]);
 
- useEffect(() => {
-  const initCart = async () => {
-    await useCartStore.persist.rehydrate();
-    await syncWithUser();
-    setLoaded(true);
+  useEffect(() => {
+    const initCart = async () => {
+      await useCartStore.persist.rehydrate();
+      await syncWithUser();
+      setLoaded(true);
+    };
+    initCart();
+  }, [setLoaded, syncWithUser]);
+
+  const handleProceedToCheckout = async () => {
+    if (!cartId) {
+      return;
+    }
+    setLoadingProceed(true);
+    const checkoutUrl = await createCheckoutSession(cartId);
+    window.location.href = checkoutUrl;
+    setLoadingProceed(false);
   };
-  initCart();
-}, [setLoaded, syncWithUser]);
   return (
     <>
       {/* Backdrop */}
@@ -215,8 +230,19 @@ const Cart = () => {
                       {formatPrice(totalPrice)}
                     </span>
                   </div>
-                  <button className="w-full bg-black text-white py-2 rounded-full hover:bg-gray-900 transition-colors flex items-center justify-center">
-                    Proceed to Checkout
+                  <button
+                    className="w-full bg-black text-white py-2 rounded-full hover:bg-gray-900 transition-colors flex items-center justify-center"
+                    onClick={handleProceedToCheckout}
+                    disabled={loadingProceed}
+                  >
+                    {loadingProceed ? (
+                      <div className="flex items-center gap-1">
+                        Naviagating to checkout
+                        <BiLoader className="w-5 h-5 animate-spin" />
+                      </div>
+                    ) : (
+                      "Proceed to checkout"
+                    )}
                   </button>
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center gap-2 text-sm text-gray-500">
